@@ -1,13 +1,30 @@
 from pydantic import BaseModel
-from typing import Optional
 from datetime import datetime
+from uuid import UUID
+from typing import Optional
 
 
-class PracticeSession(BaseModel):
-    session_id: str
-    user_id: str
-    type: str
-    dosage_level: int
-    duration_seconds: int
-    resonance_score: Optional[int] = None
+# -------------------------
+# Base shared fields
+# -------------------------
+class PracticeSessionBase(BaseModel):
+    theme: str
+    duration_minutes: int
+
+
+# -------------------------
+# Create (input)
+# -------------------------
+class PracticeSessionCreate(PracticeSessionBase):
+    pass
+
+
+# -------------------------
+# Read (output)
+# -------------------------
+class PracticeSessionRead(PracticeSessionBase):
+    id: UUID
     created_at: datetime
+
+    class Config:
+        from_attributes = True
