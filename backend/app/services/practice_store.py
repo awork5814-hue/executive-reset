@@ -1,31 +1,23 @@
-from datetime import datetime
 from uuid import uuid4
-from typing import Dict
-
-from app.schemas.practice_session import (
-    PracticeSessionCreate,
-    PracticeSessionRead,
-)
-
+from datetime import datetime
+from typing import List
 
 class PracticeStore:
     def __init__(self):
-        self._sessions: Dict[str, PracticeSessionRead] = {}
+        self.sessions = []
 
-    def create(self, payload: PracticeSessionCreate) -> PracticeSessionRead:
-        session = PracticeSessionRead(
-            id=uuid4(),
-            theme=payload.theme,
-            duration_minutes=payload.duration_minutes,
-            created_at=datetime.utcnow(),
-        )
+    def create(self, session):
+        record = {
+            "id": uuid4(),
+            "theme": session.theme,
+            "duration_minutes": session.duration_minutes,
+            "created_at": datetime.utcnow(),
+        }
+        self.sessions.append(record)
+        return record
 
-        self._sessions[str(session.id)] = session
-        return session
-
-    def get(self, session_id: str) -> PracticeSessionRead | None:
-        return self._sessions.get(session_id)
+    def list(self) -> List[dict]:
+        return self.sessions
 
 
-# ✅ THIS is what your API imports
 practice_store = PracticeStore()
