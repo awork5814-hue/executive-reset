@@ -1,28 +1,32 @@
 from fastapi import APIRouter
-from datetime import datetime, timedelta
+from app.services.wearable_store import wearable_store
+from datetime import datetime
+from app.services.wearable_store import wearable_store
 
-from app.schemas.wearable_sync import WearableSyncPayload
+from app.schemas.wearable_sync import WearableSyncIn, WearableSyncOut
 
-router = APIRouter(prefix="/wearable-sync", tags=["Wearables"])
+router = APIRouter(
+    prefix="/wearable",
+    tags=["wearable"]
+)
 
 
-@router.post("")
-def sync_wearable(data: WearableSyncPayload):
-    now = datetime.utcnow()
-    age = now - data.timestamp
+@router.post("/sync", response_model=WearableSyncOut)
+def sync_wearable(payload: WearableSyncIn):
+    wearable_store.update(payload.recorded_at)
 
-    if age > timedelta(hours=4):
-        sync_state = "stale"
-    else:
-        sync_state = "fresh"
+    return WearableSyncOut(
+        status="received",
+        recorded_at=payload.recorded_at
+    )
+
+
+@router.get("/status")
+def wearable_status():
+    last = wearable_store.get_last()
 
     return {
-        "user_id": data.user_id,
-        "sync_state": sync_state,
-        "received": {
-            "steps": data.steps,
-            "sleep_minutes": data.sleep_minutes,
-            "hrv": data.heart_rate_variability,
-        },
-        "message": "Wearable data synced"
+        "last_recorded_at": last,
+        "is_stale": wearable_store.is_stale(),
+        "checked_at": datetime.utcnow()
     }

@@ -1,20 +1,26 @@
 from fastapi import APIRouter
-from app.services.dosage_engine import determine_dosage_level
+from app.services.dosage_engine import recommend_duration
 
-router = APIRouter(prefix="/dosage-preview", tags=["Dosage"])
+router = APIRouter(prefix="/dosage-preview", tags=["Dosage Preview"])
+
+
+
 
 
 @router.get("")
-def preview_dosage(
+def dosage_preview(
     sync_state: str,
     mental_score: int,
-    physical_score: int
+    physical_score: int,
 ):
-    level, duration = determine_dosage_level(
-        sync_state, mental_score, physical_score
+    decision = recommend_duration(
+        sync_state=sync_state,
+        mental_score=mental_score,
+        physical_score=physical_score,
     )
 
     return {
-        "dosage_level": level,
-        "duration_seconds": duration
+        "recommended_minutes": decision["minutes"],
+        "reason": decision["reason"],
+        "sync_state": sync_state,   # ← use the input, not the engine
     }

@@ -1,16 +1,13 @@
-def determine_dosage_level(sync_state: str, mental_score: int, physical_score: int):
-    """
-    Returns:
-        level (int): 1 or 2
-        duration_seconds (int)
-    """
+from app.services import dosage_engine_v1
 
-    dissonance = abs(mental_score - physical_score)
 
-    if sync_state == "stale":
-        return 1, 60
-
-    if dissonance > 35:
-        return 2, 120
-
-    return 1, 60
+def recommend_duration(
+    sync_state: str,
+    mental_score: int,
+    physical_score: int,
+):
+    return dosage_engine_v1.recommend_duration(
+        sync_state=sync_state,
+        mental_score=mental_score,
+        physical_score=physical_score,
+    )

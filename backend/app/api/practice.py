@@ -15,3 +15,14 @@ router = APIRouter(
 def start_practice(payload: PracticeSessionCreate):
     session = practice_store.create(payload)
     return session
+
+
+
+@router.get(
+    "",
+    response_model=list[PracticeSessionRead]
+)
+def list_practice_sessions():
+    return practice_store.list()
+
+
